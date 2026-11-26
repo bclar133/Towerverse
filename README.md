@@ -24,3 +24,5 @@ Enemy bounties have been increased by 20% across all 21 types to improve funding
 Late-wave pressure is limited: advanced units rise to 60% by wave 10. Each wave contains at most two heavy units (including the boss); only one heavy is active at once, with a three-second gap after it is defeated or escapes. Light units have 0.8-second spacing; a heavy gets a 2.5-second lead-in before the next spawn.
 
 The campaign menu fits the viewport with all ten planets and Deploy visible. Build pads are densely packed near roads and inner bends, with direct pad clicks taking priority during construction.
+
+Broodmothers give birth to two small Spiderlings after 6 seconds, then every 8 seconds, for at most three broods. No more than six Spiderlings can be alive at once. The young stay on their mother’s route, have low health, pay $6 each and cannot reproduce.
