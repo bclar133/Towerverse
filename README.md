@@ -26,3 +26,5 @@ Late-wave pressure is limited: advanced units rise to 60% by wave 10. Each wave 
 The campaign menu fits the viewport with all ten planets and Deploy visible. Build pads are densely packed near roads and inner bends, with direct pad clicks taking priority during construction.
 
 Broodmothers give birth to two small Spiderlings after 6 seconds, then every 8 seconds, for at most three broods. No more than six Spiderlings can be alive at once. The young stay on their mother’s route, have low health, pay $6 each and cannot reproduce.
+
+APCs deploy two basic Aliens after 6 seconds, followed by another pair 8 seconds later. Each APC carries four Aliens, and at most six deployed passengers can be alive at once. Passengers follow the APC’s own path, inherit its wave health scaling and pay the normal $12 bounty.
