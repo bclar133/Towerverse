@@ -28,3 +28,5 @@ The campaign menu fits the viewport with all ten planets and Deploy visible. Bui
 Broodmothers give birth to two small Spiderlings after 6 seconds, then every 8 seconds, for at most three broods. No more than six Spiderlings can be alive at once. The young stay on their mother’s route, have low health, pay $6 each and cannot reproduce.
 
 APCs deploy two basic Aliens after 6 seconds, followed by another pair 8 seconds later. Each APC carries four Aliens, and at most six deployed passengers can be alive at once. Passengers follow the APC’s own path, inherit its wave health scaling and pay the normal $12 bounty.
+
+Shifting Sands uses wider stone gates with foreground occlusion for ground enemies. The former coloured route dots have been removed; the active north/south gate is identified in the wave status text.

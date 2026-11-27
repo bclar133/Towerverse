@@ -131,14 +131,12 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&g&&!g.ende
 window.campaign={levels,types,routes,start,menu,get state(){return g;},get progress(){return [...progress];}};
 if(window.Art){app.innerHTML='<div class="loading"><h1>TOWERVERSE</h1><p>Preparing planetary maps…</p></div>';window.Art.load().then(menu).catch(err=>{app.innerHTML='<div class="loading"><h1>Artwork could not load</h1><p>Please refresh to try again.</p></div>';console.error(err);});}else menu();
 
-function drawIllustrated(c){const art=window.Art;c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';c.drawImage(art.worlds,...art.panels[g.level],0,0,1000,600);
-// The selected route is indicated through moving light markers on changing-gate maps.
-if(g.level===7){const active=g.running?(g.wave-1)%2:g.wave%2;for(let j=0;j<2;j++){const r=g.routes[j],p=r[Math.floor(r.length/2)];c.save();c.shadowBlur=15;c.shadowColor=j===active?'#78ffe0':'#ff7777';circle(c,p.x,p.y,13,j===active?'#72ffdccc':'#b6426e99','#ffffffaa');c.restore();}}
+function drawIllustrated(c){const art=window.Art;c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';art.world(c,g.level);
 for(const d of g.debris){c.save();c.translate(d.x,d.y);c.fillStyle='#697780';c.strokeStyle='#c0c4b2';c.lineWidth=2;c.beginPath();c.moveTo(-27,9);c.lineTo(-21,-16);c.lineTo(3,-23);c.lineTo(27,-2);c.lineTo(19,21);c.closePath();c.fill();c.stroke();c.fillStyle='#e5f1cf';c.font='bold 12px system-ui';c.textAlign='center';c.fillText('CLEAR · 75',0,39);c.restore();}
 drawBuildSites(c);const hover=g.tool!==null&&g.mouse?g.mouse:null,t=g.selected;
 if(t||hover){const q=t||hover,spec=types[t?t.type:g.tool],r=spec.range+(t?(t.level-1)*15:0),ok=!hover||valid(q)&&g.cash>=spec.cost;circle(c,q.x,q.y,r,ok?'#76ffe014':'#ff747428',ok?'#99ffe7aa':'#ff8a8add');if(hover){circle(c,q.x,q.y,25,ok?'#8affda22':'#ff666633',ok?'#adffe4':'#ff8484');}}
 const renderables=[...g.towers.map(t=>({y:t.y,draw:()=>{art.tower(c,t);towerBar(c,t);}})),...g.enemies.filter(e=>!e.flying).map(e=>({y:e.y,draw:()=>{art.enemy(c,e,g.time);enemyBar(c,e);}}))];renderables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
-drawBridgeForeground(c);
+drawBridgeForeground(c);drawGateForeground(c);
 for(const e of g.enemies.filter(e=>e.flying)){art.enemy(c,e,g.time);enemyBar(c,e);}if(hover)art.tower(c,{...hover,type:g.tool,level:1,angle:-.2},.65);
 drawAmmunition(c);
 for(const e of g.effects){c.save();c.globalAlpha=e.life/.4;c.lineWidth=3;circle(c,e.x,e.y-12,(.4-e.life)*55,null,e.color);c.restore();}
@@ -187,3 +185,10 @@ function drawAmmunition(c){
  c.restore();}
 }
 function drawBridgeForeground(c){if(g.level!==5||!window.Art?.ready)return;const A=window.Art,[ox,oy,w,h]=A.panels[5],point=([x,y])=>({x:(x-ox)*1000/w,y:(y-oy)*600/h}),span=[[703,772],[709,772],[718,762],[731,752],[747,747],[761,747],[777,751],[791,759],[803,771],[812,772],[814,791],[806,791],[793,782],[780,773],[768,769],[754,767],[742,769],[727,776],[714,786],[702,791]],pillar=[[752,770],[763,770],[763,795],[758,798],[753,795]];c.save();c.beginPath();for(const polygon of[span,pillar]){polygon.map(point).forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();}c.clip();c.drawImage(A.worlds,...A.panels[5],0,0,1000,600);c.restore();}
+
+// Repaint only the actual stonework; the doorway stays open and aircraft fly above it.
+const gateStonePolygons=[
+ [[555,210],[561,184],[561,51],[600,35],[629,43],[628,60],[719,26],[735,0],[793,0],[802,26],[898,54],[914,41],[957,48],[969,70],[967,186],[977,211],[969,217],[906,216],[892,204],[890,123],[877,103],[843,84],[799,67],[792,76],[745,78],[734,69],[689,76],[651,92],[627,118],[628,188],[620,214],[559,216]],
+ [[503,780],[510,751],[514,609],[552,579],[590,585],[598,596],[687,560],[706,534],[749,530],[791,540],[802,559],[898,591],[926,584],[959,590],[970,612],[968,752],[979,784],[968,790],[904,790],[885,776],[881,663],[869,647],[832,628],[792,616],[778,620],[728,620],[697,612],[655,622],[621,637],[593,657],[591,754],[582,782],[559,790],[509,787]]
+];
+function drawGateForeground(c){if(g.level!==7||!window.Art?.ready||!window.Art.sands)return;const art=window.Art;c.save();c.beginPath();for(const polygon of gateStonePolygons){polygon.forEach(([x,y],i)=>i?c.lineTo(x*1000/1620,y*600/971):c.moveTo(x*1000/1620,y*600/971));c.closePath();}c.clip();art.world(c,7);c.restore();}
