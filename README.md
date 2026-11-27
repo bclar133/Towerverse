@@ -32,3 +32,5 @@ APCs deploy two basic Aliens after 6 seconds, followed by another pair 8 seconds
 Shifting Sands uses wider stone gates with foreground occlusion for ground enemies. The former coloured route dots have been removed; the active north/south gate is identified in the wave status text.
 
 The desert gates cross the road in isometric view: each has a far-bank pillar, a near-bank pillar and an overhead lintel. Ground units pass behind the near pillar and lintel, while the far pillar remains behind the units.
+
+Gun, Grenade, Mud, Laser, Flak, Flame, Poison and Rocket towers use separate rotating weapon heads on stationary bases, smooth aiming in all directions, firing recoil and barrel-aligned ammunition. Arrow Brigade and Electricity Zapper stay fixed. Gun heads use silver/grey steel; Mud heads retain bronze/brown tanks and hoses.
