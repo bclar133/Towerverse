@@ -76,3 +76,12 @@ r=routes[0][0]
 join=next(i for i,q in enumerate(r) if q['x']>=122)
 routes[0][0]=[{'x':26.05,'y':268.97},{'x':74.15,'y':268.97}]+r[join:]
 p.write_text(json.dumps(routes,separators=(',',':')))
+
+# Cross the gates on the road centre rather than routing around their visible stonework.
+p=Path('dist/assets/navigation.json')
+routes=json.loads(p.read_text())
+fixes=[(360,660,[(360,95),(400,102),(440,111),(480,122),(520,133),(560,141),(600,146),(640,160),(660,180)]),(360,610,[(360,450),(400,451),(440,452),(480,452),(520,452),(560,452),(600,450),(610,446)])]
+for j,(lo,hi,points) in enumerate(fixes):
+ r=routes[7][j]
+ routes[7][j]=[p for p in r if p['x']<lo]+[dict(x=x,y=y) for x,y in points]+[p for p in r if p['x']>hi]
+p.write_text(json.dumps(routes,separators=(',',':')))
