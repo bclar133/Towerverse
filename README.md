@@ -34,3 +34,5 @@ Shifting Sands uses wider stone gates with foreground occlusion for ground enemi
 The desert gates cross the road in isometric view: each has a far-bank pillar, a near-bank pillar and an overhead lintel. Ground units pass behind the near pillar and lintel, while the far pillar remains behind the units.
 
 Gun, Grenade, Mud, Laser, Flak, Flame, Poison and Rocket towers use separate rotating weapon heads on stationary bases, smooth aiming in all directions, firing recoil and barrel-aligned ammunition. Arrow Brigade and Electricity Zapper stay fixed. Gun heads use silver/grey steel; Mud heads retain bronze/brown tanks and hoses.
+
+Planet 9 has been redesigned: two entries merge into a 2,700-unit shared snaking road with two hairpins before the reactor at the lower-right. Build pads are restricted to clear platforms between lanes and near bends, within weapon range of the road. The reactor, portals and perimeter machinery are excluded.

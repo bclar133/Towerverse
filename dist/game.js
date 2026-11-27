@@ -8,7 +8,7 @@ const levels=[
 ['The Figure Eight','Cover both loops from the glowing forest.','#153e53','#5fc4ed','#9f9caa','Crossing bridge • two loops'],
 ['Overgrown Station','Reclaim a station swallowed by the forest.','#2b4440','#a6c693','#a1a59a','Clear rubble • unlock building space'],
 ['Shifting Sands','Ancient gates change the route each wave.','#67422c','#e8b77f','#c7a276','Alternating gates • previewed routes'],
-['The Reactor','Four approaches. Defend the core.','#263745','#6bc9ed','#7f8a90','Four entrances • central base'],
+['The Reactor','Hold the reactor through a long shared approach.','#263745','#6bc9ed','#7f8a90','Two entrances • long shared route'],
 ['Alien Homeworld','Their world. Your final stand.','#322238','#da78cf','#8b6a84','Multiple entrances • shared final approach']];
 const types=[
 {name:'Gun',cost:100,range:135,damage:18,rate:.55,color:'#d6e0e8',icon:'✚',note:'Reliable single target'},
@@ -80,7 +80,9 @@ $('#back').onclick=()=>{g.paused=true;modal('Leave this mission?','Your complete
 types.forEach((t,j)=>{const b=document.createElement('button');b.className='shop-item';b.title=t.name+' — '+t.note;b.setAttribute('aria-label',t.name+', $'+t.cost+', '+t.note);b.innerHTML=`<canvas class="shop-sprite" width="100" height="100" data-tower="${j}" aria-hidden="true"></canvas><span><strong>${t.short||t.name}</strong><small>${t.note}</small></span><span class="cost"><kbd>${j===9?0:j+1}</kbd> $${t.cost}</span>`;b.onclick=()=>{g.tool=j;g.selected=null;updateUI();};$('.tower-shop').append(b);if(window.Art?.ready){const sc=b.querySelector('canvas').getContext('2d');window.Art.tower(sc,{x:50,y:77,type:j,level:1,angle:0});}});
 const cv=$('canvas');function point(e){const r=cv.getBoundingClientRect(),scale=Math.min(r.width/1000,r.height/600);return{x:(e.clientX-r.left-(r.width-1000*scale)/2)/scale,y:(e.clientY-r.top-(r.height-600*scale)/2)/scale};}cv.onpointermove=e=>{const p=point(e);g.mouse=g.tool===null?p:(nearestSite(p)||p);};cv.onpointerleave=()=>{g.mouse=null;};cv.onpointerdown=e=>{const p=point(e);g.mouse=p;act(p);};cv.oncontextmenu=e=>{e.preventDefault();g.tool=null;g.selected=null;updateUI();};updateUI();previous=performance.now();frame=requestAnimationFrame(loop);
 }
-function terrainValid(p){if(window.Art?.ready&&!window.Art.buildable(g.level,p))return false;if(p.x<28||p.x>972||p.y<28||p.y>572)return false;if(pathDistance(p,g.routes)<44)return false;if(!window.Art?.ready&&g.decor.some(d=>Math.hypot(p.x-d.x,p.y-d.y)<d.r+19))return false;if(g.debris.some(d=>Math.hypot(p.x-d.x,p.y-d.y)<62))return false;if(!window.Art?.ready&&g.level===4&&![[180,260,140],[390,180,125],[540,395,125],[730,350,135],[920,230,105]].some(([x,y,r])=>Math.hypot(p.x-x,p.y-y)<r-24))return false;return true;}
+const reactorBuildZones=[[195,35,865,82],[90,160,865,207],[170,285,920,337],[170,420,720,530]];
+function reactorBuildable(p){return reactorBuildZones.some(([x1,y1,x2,y2])=>p.x>=x1&&p.x<=x2&&p.y>=y1&&p.y<=y2)&&Math.hypot((p.x-858)/116,(p.y-465)/119)>1&&pathDistance(p,g.routes)<=135&&!g.routes.some(r=>Math.hypot(p.x-r[0].x,p.y-r[0].y)<65);}
+function terrainValid(p){if(g.level===8&&!reactorBuildable(p))return false;if(window.Art?.ready&&!window.Art.buildable(g.level,p))return false;if(p.x<28||p.x>972||p.y<28||p.y>572)return false;if(pathDistance(p,g.routes)<44)return false;if(!window.Art?.ready&&g.decor.some(d=>Math.hypot(p.x-d.x,p.y-d.y)<d.r+19))return false;if(g.debris.some(d=>Math.hypot(p.x-d.x,p.y-d.y)<62))return false;if(!window.Art?.ready&&g.level===4&&![[180,260,140],[390,180,125],[540,395,125],[730,350,135],[920,230,105]].some(([x,y,r])=>Math.hypot(p.x-x,p.y-y)<r-24))return false;return true;}
 const buildSiteCache=new Map();
 function createBuildSites(){const key=g.level+':'+!!window.Art?.ready+':'+g.debris.map(d=>d.x+','+d.y).join(';');if(buildSiteCache.has(key))return buildSiteCache.get(key);const candidates=[];for(let y=36;y<=564;y+=8)for(let x=36;x<=964;x+=8){const p={x,y};if(terrainValid(p))candidates.push({...p,score:Math.abs(pathDistance(p,g.routes)-55)});}candidates.sort((a,b)=>a.score-b.score||a.y-b.y||a.x-b.x);const sites=[];for(const p of candidates)if(sites.every(q=>Math.hypot((p.x-q.x)/46,(p.y-q.y)/48)>=1))sites.push(p);buildSiteCache.set(key,sites);return sites;}
 function nearestSite(p){return g.buildSites.filter(q=>Math.hypot(q.x-p.x,q.y-p.y)<=29).sort((a,b)=>Math.hypot(a.x-p.x,a.y-p.y)-Math.hypot(b.x-p.x,b.y-p.y))[0];}
@@ -136,7 +138,7 @@ for(const d of g.debris){c.save();c.translate(d.x,d.y);c.fillStyle='#697780';c.s
 drawBuildSites(c);const hover=g.tool!==null&&g.mouse?g.mouse:null,t=g.selected;
 if(t||hover){const q=t||hover,spec=types[t?t.type:g.tool],r=spec.range+(t?(t.level-1)*15:0),ok=!hover||valid(q)&&g.cash>=spec.cost;circle(c,q.x,q.y,r,ok?'#76ffe014':'#ff747428',ok?'#99ffe7aa':'#ff8a8add');if(hover){circle(c,q.x,q.y,25,ok?'#8affda22':'#ff666633',ok?'#adffe4':'#ff8484');}}
 const renderables=[...g.towers.map(t=>({y:t.y,draw:()=>{art.tower(c,t);towerBar(c,t);}})),...g.enemies.filter(e=>!e.flying).map(e=>({y:e.y,draw:()=>{art.enemy(c,e,g.time);enemyBar(c,e);}}))];renderables.sort((a,b)=>a.y-b.y).forEach(o=>o.draw());
-drawBridgeForeground(c);drawGateForeground(c);
+drawBridgeForeground(c);drawGateForeground(c);drawReactorForeground(c);
 for(const e of g.enemies.filter(e=>e.flying)){art.enemy(c,e,g.time);enemyBar(c,e);}if(hover)art.tower(c,{...hover,type:g.tool,level:1,angle:-.2},.65);
 drawAmmunition(c);
 for(const e of g.effects){c.save();c.globalAlpha=e.life/.4;c.lineWidth=3;circle(c,e.x,e.y-12,(.4-e.life)*55,null,e.color);c.restore();}
@@ -194,3 +196,5 @@ const gateStonePolygons=[
  [[580,803],[588,780],[590,653],[591,636],[629,606],[654,613],[690,580],[689,559],[723,537],[751,542],[769,551],[770,531],[805,514],[847,529],[850,550],[839,566],[818,577],[791,565],[767,566],[764,597],[743,610],[726,604],[705,614],[676,641],[656,669],[650,688],[650,778],[675,797],[670,811],[641,822],[586,806]]
 ];
 function drawGateForeground(c){if(g.level!==7||!window.Art?.ready||!window.Art.sands)return;const art=window.Art;c.save();c.beginPath();for(const polygon of gateStonePolygons){polygon.forEach(([x,y],i)=>i?c.lineTo(x*1000/1620,y*600/971):c.moveTo(x*1000/1620,y*600/971));c.closePath();}c.clip();art.world(c,7);c.restore();}
+
+function drawReactorForeground(c){if(g.level!==8||!window.Art?.ready||!window.Art.reactor)return;const polygon=[[1385,598],[1398,636],[1405,651],[1452,646],[1486,668],[1502,691],[1527,706],[1533,749],[1522,783],[1502,804],[1475,828],[1430,850],[1390,860],[1335,850],[1290,830],[1260,800],[1250,767],[1255,731],[1271,693],[1294,663],[1339,646],[1377,647]];c.save();c.beginPath();polygon.forEach(([x,y],i)=>i?c.lineTo(x*1000/1620,y*600/971):c.moveTo(x*1000/1620,y*600/971));c.closePath();c.clip();window.Art.world(c,8);c.restore();}
